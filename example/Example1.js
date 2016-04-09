@@ -4,17 +4,37 @@
 app.service('Test', function () {
     return function (tt) {
         this.test = function () {
-            console.log('service loaded' + tt)
+
         }
     };
 
 });
 app.config(function () {
+
 });
-app.controller('InputChange', function () {
+app.controller('InputChange', function (parameters) {
+    console.log(parameters);
     app.get('Test','ttt').test();
-    app.addEvent('#test', 'keyup', function () {
+    this.addEvent('#test', 'keyup', function () {
+        var value = $(this).val();
+        $('#youWrote').html(value);
+    });
+    this.addEvent('#test2', 'keyup', function () {
         var value = $(this).val();
         $('#youWrote').html(value);
     });
 });
+app.controller('FatherController',function(){
+    this.addEvent('#test2', 'keyup', function () {
+        var value = $(this).val();
+        $('#youWrote').html(value);
+    });
+});
+app.controller('AnotherController',function(){
+    this.addEvent('#test2', 'keyup', function () {
+        var value = $(this).val();
+        $('#youWrote').html(value);
+    });
+});
+
+app.run(true);

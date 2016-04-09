@@ -3,7 +3,7 @@
  *
  * Simple Jquery Framework that will allow to have a neater code.
  */
-function App() {
+function MiniMeApp() {
     "use strict";
     var controllerFunctions = {};
     var configFunctions = [];
@@ -13,6 +13,7 @@ function App() {
      * Execute the configuration declared before
      */
     function runConfigurations() {
+        app.get('Debug').info("Running Configuration");
         configFunctions.forEach(function (configFunc) {
             configFunc();
         });
@@ -24,9 +25,13 @@ function App() {
     function searchAndExecuteControllers() {
         var controllersInPage = $('[data-controller]');
         controllersInPage.each(function (i, selector) {
-            var controllerName = $(selector).data('controller');
-            if (typeof controllerName !== 'undefined' && controllerName in controllerFunctions) {
-                controllerFunctions[controllerName]();
+            var currentController = $(selector).data('controller');
+            app.get('Debug').info("Running Controller: {" + currentController+'}');
+            if (typeof currentController !== 'undefined' && currentController in controllerFunctions) {
+                controllerFunctions['PVT_controllerName'] = currentController;
+                controllerFunctions['addEvent'] = addEventListener;
+                var params = $(selector).data('controller-params') || {};
+                controllerFunctions[currentController](params);
             }
         })
     }
@@ -43,7 +48,8 @@ function App() {
         if ($.type(fnc) === 'string') {
             fnc = this[fnc];
         }
-        $(el).on(event, fnc);
+        app.get('Debug').info("     Adding Event:  {" + event + '} on {'+el+'}');
+        $('[data-controller="' + this.PVT_controllerName + '"] ').on(event, el, fnc);
         return this;
     }
 
@@ -61,7 +67,9 @@ function App() {
     /**
      * Run The Framework
      */
-    function run() {
+    function run(debugStatus) {
+        var dbg = debugStatus || false;
+        addService('Debug', new Debug(dbg));
         runConfigurations();
         searchAndExecuteControllers();
     }
@@ -86,7 +94,11 @@ function App() {
      * @returns {addService}
      */
     function addService(name, func) {
-        serviceFunctions[name] = func();
+        if ($.type(func) == 'function') {
+            serviceFunctions[name] = func();
+        } else {
+            serviceFunctions[name] = func;
+        }
         return this;
     }
 
@@ -110,10 +122,9 @@ function App() {
         service: addService,
         get: getService,
         controller: addController,
-        addEvent: addEventListener,
         config: addConfiguration,
         run: run
     };
 }
 
-app = new App();
+app = new MiniMeApp();
