@@ -5,26 +5,74 @@
  */
 
 function Debug(debugStatus) {
+    "use strict";
     var enableDebug = debugStatus || false;
+
+    /**
+     * Initialise missing methods
+     */
+    for (var method in console) {
+        if (typeof this[method] === 'function') continue;
+
+        this[method] = (function (name,enableDebug) {
+            return function (args) {
+                if (!enableDebug) {
+                    return;
+                }
+                console[name].call(console, args);
+            }
+        })(method,enableDebug);
+    }
+    
     this.log = function () {
-        if (enableDebug) {
-            console.info.apply(console, arguments);
+        writeln('log', arguments);
+    };
+
+    this.info = function () {
+        writeln('info', arguments);
+    };
+
+    this.warn = function () {
+        writeln('warn', arguments);
+    };
+
+    this.error = function () {
+        writeln('error', arguments);
+    };
+
+    /**
+     * General function to print the string on the console
+     * @param type
+     * @param messages
+     */
+    function writeln(type, messages) {
+        if (!enableDebug) {
+            return;
+        }
+        for (var i = 0; i < messages.length; i++) {
+            var message = messages[i];
+
+            var newArguments = null;
+
+            if (typeof message === 'string') {
+                newArguments = colourise(message);
+            }
+
+            if (newArguments === null) {
+                newArguments = [message];
+            }
+
+            console[type].apply(console, newArguments);
+
         }
     }
 
-    this.info = function () {
-        var newArguments = colourise(arguments);
-
-        if (newArguments == null) {
-            newArguments = arguments;
-        }
-        if (enableDebug) {
-            console.info.apply(console, newArguments);
-        }
-    };
-
-    function colourise(arguments) {
-        var message = arguments[0];
+    /**
+     * It will prepare the arguments to colour the string
+     * @param args
+     * @returns {*}
+     */
+    function colourise(message) {
         var newArgumentsArray = [""];
         var matches = message.match(/{(.*?)}/g);
         if (matches === null) {
@@ -33,10 +81,10 @@ function Debug(debugStatus) {
         matches.forEach(function (match) {
             message = message.replace(match, '%c' + match.substr(1, match.length - 2) + '%c');
             newArgumentsArray.push('color:#0074D9;font-weight:bold');
-            newArgumentsArray.push('')
+            newArgumentsArray.push('');
         });
         newArgumentsArray[0] = message;
 
         return newArgumentsArray;
     }
-};
+}

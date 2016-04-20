@@ -1,7 +1,7 @@
 /**
  * Created by alice on 21/01/2016.
  */
-app.service('Test', function () {
+MiniMe.service('Test', function () {
     return function (tt) {
         this.test = function () {
 
@@ -9,13 +9,17 @@ app.service('Test', function () {
     };
 
 });
-app.config(function () {
+MiniMe.config(function () {
 
 });
-app.controller('InputChange', function (parameters) {
-    console.log(parameters);
-    app.get('Test', 'ttt').test();
+MiniMe.controller('InputChange', function (parameters) {
+
+    MiniMe.get('Debug').table([{a:1},{v:2}]);
+
+    MiniMe.get('Test', 'ttt').test();
+
     this.addEvent('#test', 'keyup', function () {
+        console.log('ddd');
         var value = $(this).val();
         $('#youWrote').html(value);
     });
@@ -23,18 +27,19 @@ app.controller('InputChange', function (parameters) {
         var value = $(this).val();
         $('#youWrote').html(value);
     });
+
 });
-app.controller('FatherController', function () {
+MiniMe.controller('FatherController', function () {
     this.addEvent('#test2', 'keyup', function () {
         var value = $(this).val();
         $('#youWrote').html(value);
     });
 });
-app.controller('AnotherController', function () {
+MiniMe.controller('AnotherController', function () {
     this.addEvent('#test2', 'keyup', function () {
         var value = $(this).val();
         $('#youWrote').html(value);
     });
 });
 
-app.run(true);
+MiniMe.run(true);

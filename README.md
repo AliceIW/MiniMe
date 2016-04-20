@@ -93,15 +93,15 @@ Just call at the end, after all the definitions
 
 # Built-in Services
 
-###### Debug Service *(In Progress)*
+###### Debug Service
 It's a wrapper class for the console command. Use the Brackets to highlight the text inside (it will become bold and blue).
 
 ```javascript
-    app.get('Debug').log("This is my {Text}");
+    app.get('Debug').log("This is my {Text}",{a:1,b:2});
 ```
 
 
 # Todo
 - Replace .forEach with for
 - Write Jasmine Test
-- Adding more option to the debug object
+- Debug .log should be able to get an array instead of a string and print both
