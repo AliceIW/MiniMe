@@ -13,7 +13,7 @@ function MiniMeApp() {
      * Execute the configuration declared before
      */
     function runConfigurations() {
-        app.get('Debug').info("Running Configuration");
+        MiniMe.get('Debug').info("Running Configuration");
         configFunctions.forEach(function (configFunc) {
             configFunc();
         });
@@ -24,34 +24,36 @@ function MiniMeApp() {
      */
     function searchAndExecuteControllers() {
         var controllersInPage = $('[data-controller]');
-        controllersInPage.each(function (i, selector) {
+        controllersInPage.each(function (i,selector) {
             var currentController = $(selector).data('controller');
-            app.get('Debug').info("Running Controller: {" + currentController + '}');
             if (typeof currentController !== 'undefined' && currentController in controllerFunctions) {
-                controllerFunctions['PVT_controllerName'] = currentController;
-                controllerFunctions['addEvent'] = addEventListener;
+                MiniMe.get('Debug').info("Running Controller: {" + currentController + '}');
+                addControllersFunctions(controllerFunctions[currentController], currentController);
                 var params = $(selector).data('controller-params') || {};
-                controllerFunctions[currentController](params);
+
+                controllerFunctions[currentController].call(controllerFunctions[currentController], params);
             }
-        })
+        });
     }
 
     /**
-     *  Add an event to the specific controller
-     *
-     * @param el
-     * @param event
-     * @param fnc
-     * @returns {addEventListener}
+     * Add a the addEvent function and controller name variable
+     * @param ctrl
+     * @param currentController
      */
-    function addEventListener(el, event, fnc) {
-        if ($.type(fnc) === 'string') {
-            fnc = this[fnc];
-        }
-        app.get('Debug').info("     Adding Event:  {" + event + '} on {' + el + '}');
-        $('[data-controller="' + this.PVT_controllerName + '"] ').on(event, el, fnc);
-        return this;
+
+    function addControllersFunctions(ctrl, currentController) {
+        ctrl.PVT_controllerName = currentController;
+        ctrl.addEvent = function (el, event, fnc) {
+            if ($.type(fnc) === 'string') {
+                fnc = this[fnc];
+            }
+            MiniMe.get('Debug').info("     Adding Event:  {" + event + '} on {' + el + '}');
+            $('[data-controller="' + this.PVT_controllerName + '"] ').on(event, el, fnc);
+            return this;
+        };
     }
+
 
     /**
      * add Configuration
@@ -61,7 +63,6 @@ function MiniMeApp() {
      */
     function addConfiguration(func) {
         configFunctions.push(func);
-        return this;
     }
 
     /**
@@ -83,7 +84,6 @@ function MiniMeApp() {
      */
     function addController(name, func) {
         controllerFunctions[name] = func;
-        return this;
     }
 
     /**
@@ -94,14 +94,13 @@ function MiniMeApp() {
      * @returns {addService}
      */
     function addService(name, func, init) {
-        var resolve = (init == undefined) ? true : false;
+        var resolve = typeof init === 'undefined';
 
-        if ($.type(func) == 'function' && resolve == true) {
+        if ($.type(func) === 'function' && resolve === true) {
             serviceFunctions[name] = func();
         } else {
             serviceFunctions[name] = func;
         }
-        return this;
     }
 
     /**
@@ -113,14 +112,14 @@ function MiniMeApp() {
     function getService(name) {
         var args = Array.prototype.slice.call(arguments);
 
-        if ($.type(serviceFunctions[name]) == 'function') {
-            return new serviceFunctions[name](args.slice(1))
+        if ($.type(serviceFunctions[name]) === 'function') {
+            return new serviceFunctions[name](args.slice(1));
         }
         return serviceFunctions[name];
     }
 
     return {
-        version: '0.0.1',
+        version: '1.0.0',
         service: addService,
         get: getService,
         controller: addController,
@@ -129,7 +128,7 @@ function MiniMeApp() {
     };
 }
 
-app = new MiniMeApp();
+ var MiniMe = new MiniMeApp();
 /**
  * Created by alice on 21/01/2016.
  *
@@ -137,26 +136,74 @@ app = new MiniMeApp();
  */
 
 function Debug(debugStatus) {
+    "use strict";
     var enableDebug = debugStatus || false;
+
+    /**
+     * Initialise missing methods
+     */
+    for (var method in console) {
+        if (typeof this[method] === 'function') continue;
+
+        this[method] = (function (name,enableDebug) {
+            return function (args) {
+                if (!enableDebug) {
+                    return;
+                }
+                console[name].call(console, args);
+            }
+        })(method,enableDebug);
+    }
+    
     this.log = function () {
-        if (enableDebug) {
-            console.info.apply(console, arguments);
+        writeln('log', arguments);
+    };
+
+    this.info = function () {
+        writeln('info', arguments);
+    };
+
+    this.warn = function () {
+        writeln('warn', arguments);
+    };
+
+    this.error = function () {
+        writeln('error', arguments);
+    };
+
+    /**
+     * General function to print the string on the console
+     * @param type
+     * @param messages
+     */
+    function writeln(type, messages) {
+        if (!enableDebug) {
+            return;
+        }
+        for (var i = 0; i < messages.length; i++) {
+            var message = messages[i];
+
+            var newArguments = null;
+
+            if (typeof message === 'string') {
+                newArguments = colourise(message);
+            }
+
+            if (newArguments === null) {
+                newArguments = [message];
+            }
+
+            console[type].apply(console, newArguments);
+
         }
     }
 
-    this.info = function () {
-        var newArguments = colourise(arguments);
-
-        if (newArguments == null) {
-            newArguments = arguments;
-        }
-        if (enableDebug) {
-            console.info.apply(console, newArguments);
-        }
-    };
-
-    function colourise(arguments) {
-        var message = arguments[0];
+    /**
+     * It will prepare the arguments to colour the string
+     * @param args
+     * @returns {*}
+     */
+    function colourise(message) {
         var newArgumentsArray = [""];
         var matches = message.match(/{(.*?)}/g);
         if (matches === null) {
@@ -165,10 +212,10 @@ function Debug(debugStatus) {
         matches.forEach(function (match) {
             message = message.replace(match, '%c' + match.substr(1, match.length - 2) + '%c');
             newArgumentsArray.push('color:#0074D9;font-weight:bold');
-            newArgumentsArray.push('')
+            newArgumentsArray.push('');
         });
         newArgumentsArray[0] = message;
 
         return newArgumentsArray;
     }
-};
+}
