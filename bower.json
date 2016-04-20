@@ -1,0 +1,28 @@
+{
+  "name": "MiniMe",
+  "homepage": "https://github.com/AliceIW/MiniMe",
+  "authors": [
+    "Aliceiw"
+  ],
+  "description": "MiniMe is a wrapper to keep your Js organised",
+  "main": "dist/MiniMe.js",
+  "dependencies": {
+    "jquery":"latest"
+  },
+  "moduleType": [
+    "amd"
+  ],
+  "keywords": [
+    "MiniMe",
+    "Jquery",
+    "Wrapper"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
