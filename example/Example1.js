@@ -14,7 +14,7 @@ app.config(function () {
 });
 app.controller('InputChange', function (parameters) {
     console.log(parameters);
-    app.get('Test','ttt').test();
+    app.get('Test', 'ttt').test();
     this.addEvent('#test', 'keyup', function () {
         var value = $(this).val();
         $('#youWrote').html(value);
@@ -24,13 +24,13 @@ app.controller('InputChange', function (parameters) {
         $('#youWrote').html(value);
     });
 });
-app.controller('FatherController',function(){
+app.controller('FatherController', function () {
     this.addEvent('#test2', 'keyup', function () {
         var value = $(this).val();
         $('#youWrote').html(value);
     });
 });
-app.controller('AnotherController',function(){
+app.controller('AnotherController', function () {
     this.addEvent('#test2', 'keyup', function () {
         var value = $(this).val();
         $('#youWrote').html(value);

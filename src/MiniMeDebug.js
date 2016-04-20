@@ -7,13 +7,8 @@
 function Debug(debugStatus) {
     var enableDebug = debugStatus || false;
     this.log = function () {
-        var newArguments = colourise(arguments);
-
-        if (newArguments == null) {
-            newArguments = arguments;
-        }
         if (enableDebug) {
-            console.info.apply(console, newArguments);
+            console.info.apply(console, arguments);
         }
     }
 

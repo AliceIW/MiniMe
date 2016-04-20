@@ -26,7 +26,7 @@ function MiniMeApp() {
         var controllersInPage = $('[data-controller]');
         controllersInPage.each(function (i, selector) {
             var currentController = $(selector).data('controller');
-            app.get('Debug').info("Running Controller: {" + currentController+'}');
+            app.get('Debug').info("Running Controller: {" + currentController + '}');
             if (typeof currentController !== 'undefined' && currentController in controllerFunctions) {
                 controllerFunctions['PVT_controllerName'] = currentController;
                 controllerFunctions['addEvent'] = addEventListener;
@@ -48,7 +48,7 @@ function MiniMeApp() {
         if ($.type(fnc) === 'string') {
             fnc = this[fnc];
         }
-        app.get('Debug').info("     Adding Event:  {" + event + '} on {'+el+'}');
+        app.get('Debug').info("     Adding Event:  {" + event + '} on {' + el + '}');
         $('[data-controller="' + this.PVT_controllerName + '"] ').on(event, el, fnc);
         return this;
     }
@@ -93,8 +93,10 @@ function MiniMeApp() {
      * @param func
      * @returns {addService}
      */
-    function addService(name, func) {
-        if ($.type(func) == 'function') {
+    function addService(name, func, init) {
+        var resolve = (init == undefined) ? true : false;
+
+        if ($.type(func) == 'function' && resolve == true) {
             serviceFunctions[name] = func();
         } else {
             serviceFunctions[name] = func;
