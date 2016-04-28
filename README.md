@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/AliceIW/MiniMe.svg?branch=master)](https://travis-ci.org/AliceIW/MiniMe)
 # MiniMe Js
 
 MiniMe was born out of a necessity to keep my jquery code more organised.
