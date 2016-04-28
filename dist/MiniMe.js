@@ -23,17 +23,21 @@ function MiniMeApp() {
      * Takes the controllers and execute them
      */
     function searchAndExecuteControllers() {
-        var controllersInPage = $('[data-controller]');
-        controllersInPage.each(function (i,selector) {
-            var currentController = $(selector).data('controller');
+        var controllersInPage = Aquery('[data-controller]');
+        [].forEach.call(controllersInPage, function (selector) {
+            var currentController = selector.getAttribute('data-controller');
             if (typeof currentController !== 'undefined' && currentController in controllerFunctions) {
                 MiniMe.get('Debug').info("Running Controller: {" + currentController + '}');
                 addControllersFunctions(controllerFunctions[currentController], currentController);
-                var params = $(selector).data('controller-params') || {};
-
+                var params = selector.getAttribute('data-controller-params') || {};
                 controllerFunctions[currentController].call(controllerFunctions[currentController], params);
             }
         });
+    }
+
+
+    function Aquery(selector) {
+        return document.querySelectorAll(selector);
     }
 
     /**
@@ -44,16 +48,22 @@ function MiniMeApp() {
 
     function addControllersFunctions(ctrl, currentController) {
         ctrl.PVT_controllerName = currentController;
-        ctrl.addEvent = function (el, event, fnc) {
-            if ($.type(fnc) === 'string') {
+        ctrl.addEvent = function (el, eventTrigger, fnc) {
+            if (typeof fnc === 'string') {
                 fnc = this[fnc];
             }
-            MiniMe.get('Debug').info("     Adding Event:  {" + event + '} on {' + el + '}');
-            $('[data-controller="' + this.PVT_controllerName + '"] ').on(event, el, fnc);
+            MiniMe.get('Debug').info("     Adding Event:  {" + eventTrigger + '} on {' + el + '}');
+            $('[data-controller="' + this.PVT_controllerName + '"] ').on(eventTrigger, el, fnc);
+
+            // Aquery('[data-controller="' + this.PVT_controllerName + '"] ')[0]
+            //     .addEventListener(eventTrigger, function (event) {
+            //         if(Aquery(el)[0] == event.target){
+            //             fnc();
+            //         }
+            //     });
             return this;
         };
     }
-
 
     /**
      * add Configuration
@@ -96,7 +106,7 @@ function MiniMeApp() {
     function addService(name, func, init) {
         var resolve = typeof init === 'undefined';
 
-        if ($.type(func) === 'function' && resolve === true) {
+        if (typeof func === 'function' && resolve === true) {
             serviceFunctions[name] = func();
         } else {
             serviceFunctions[name] = func;
@@ -112,8 +122,9 @@ function MiniMeApp() {
     function getService(name) {
         var args = Array.prototype.slice.call(arguments);
 
-        if ($.type(serviceFunctions[name]) === 'function') {
-            return new serviceFunctions[name](args.slice(1));
+        if (typeof serviceFunctions[name] === 'function') {
+
+            return new (Function.prototype.bind.apply(serviceFunctions[name], args));
         }
         return serviceFunctions[name];
     }
@@ -128,7 +139,7 @@ function MiniMeApp() {
     };
 }
 
- var MiniMe = new MiniMeApp();
+var MiniMe = new MiniMeApp();
 /**
  * Created by alice on 21/01/2016.
  *
@@ -137,13 +148,17 @@ function MiniMeApp() {
 
 function Debug(debugStatus) {
     "use strict";
+    this.className='Debug';
     var enableDebug = debugStatus || false;
 
     /**
      * Initialise missing methods
      */
     for (var method in console) {
-        if (typeof this[method] === 'function') continue;
+        if (typeof this[method] === 'function')
+        {
+            continue;
+        }
 
         this[method] = (function (name,enableDebug) {
             return function (args) {
@@ -151,7 +166,7 @@ function Debug(debugStatus) {
                     return;
                 }
                 console[name].call(console, args);
-            }
+            };
         })(method,enableDebug);
     }
     
