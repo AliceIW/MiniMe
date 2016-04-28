@@ -102,6 +102,6 @@ It's a wrapper class for the console command. Use the Brackets to highlight the 
 
 
 # Todo
-- Replace .forEach with for
-- Write Jasmine Test
-- Debug .log should be able to get an array instead of a string and print both
+- Add TemplateHelper
+- Write Better Docs
+- Write Better Example

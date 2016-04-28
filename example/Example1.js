@@ -14,7 +14,7 @@ MiniMe.config(function () {
 });
 MiniMe.controller('InputChange', function (parameters) {
 
-    MiniMe.get('Debug').table([{a:1},{v:2}]);
+    MiniMe.get('Debug').info([{a:1},{v:2}],'{saddads}');
 
     MiniMe.get('Test', 'ttt').test();
 

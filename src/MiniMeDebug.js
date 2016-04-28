@@ -6,13 +6,17 @@
 
 function Debug(debugStatus) {
     "use strict";
+    this.className='Debug';
     var enableDebug = debugStatus || false;
 
     /**
      * Initialise missing methods
      */
     for (var method in console) {
-        if (typeof this[method] === 'function') continue;
+        if (typeof this[method] === 'function')
+        {
+            continue;
+        }
 
         this[method] = (function (name,enableDebug) {
             return function (args) {
@@ -20,7 +24,7 @@ function Debug(debugStatus) {
                     return;
                 }
                 console[name].call(console, args);
-            }
+            };
         })(method,enableDebug);
     }
     

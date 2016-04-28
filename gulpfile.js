@@ -37,5 +37,5 @@ gulp.task('scripts', ['clean-js'], function () {
 
 
 gulp.task('watch', function () {
-    gulp.watch("scr/**/*.js", ["scripts"]);
+    gulp.watch("src/**/*.js", ["scripts"]);
 });
