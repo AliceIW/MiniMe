@@ -125,6 +125,9 @@ describe('MiniMe', function () {
             });
         });
         describe('Controller', function () {
+            beforeEach(function(){
+               $('body').append('<div data-controller="TestController"><div id="hello" style="display:none;"></div></div>');
+            });
             it('It should initialise the controller if present in the current dom', function () {
                 var controllerInit =false;
                 MiniMe.controller('TestController', function () {
