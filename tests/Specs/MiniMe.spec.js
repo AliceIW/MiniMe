@@ -53,19 +53,9 @@ describe('MiniMe', function () {
                 debug = MiniMe.get('Debug');
             });
             it('It should call the unaltered method', function () {
-                var tableData = [
-                    {
-                        a: 0,
-                        b: 1
-                    },
-                    {
-                        a: 1,
-                        b: 2
-                    }
-                ];
-                console.table = jasmine.createSpy("table");
-                debug.table(tableData);
-                expect(console.table).toHaveBeenCalledWith(tableData);
+                console.count = jasmine.createSpy("count");
+                debug.count();
+                expect(console.count).toHaveBeenCalled();
             });
         });
     });
